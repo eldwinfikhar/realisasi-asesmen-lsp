@@ -8,7 +8,7 @@ class Assessment extends Model
 {
     public function assessee()
     {
-        return $this->belongsTo(User::class, 'assessee_id');
+        return $this->belongsTo(Assessee::class, 'assessee_id');
     }
 
     public function assessor()

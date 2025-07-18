@@ -24,7 +24,7 @@ class AssessmentController extends Controller
     public function create()
     {
         // Show form for creating a new assessment
-        // return view('assessments.create');
+        return view('assessments.create');
     }
 
     /**

@@ -13,9 +13,9 @@ class AssessorController extends Controller
      */
     public function index()
     {
-        // Query all assessors with their assessment count
+        // Query all assessors with their assessment count (report logic)
         $assessors = \App\Models\Assessor::withCount('assessments')->get();
-        return response(view('assessors.index', compact('assessors')));
+        return response(view('pages.laporan-asesor', compact('assessors')));
     }
 
     /**

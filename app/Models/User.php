@@ -46,13 +46,5 @@ class User extends Authenticatable
         ];
     }
 
-    public function entity()
-    {
-        return $this->belongsTo(Entity::class, 'entity_id');
-    }
-
-    public function assessments()
-    {
-        return $this->hasMany(Assessment::class, 'assessee_id');
-    }
+    // Relationships 'entity' and 'assessments' removed as they are no longer needed.
 }
