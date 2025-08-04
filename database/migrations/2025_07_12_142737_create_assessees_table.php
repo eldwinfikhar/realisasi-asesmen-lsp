@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('npp')->unique()->nullable();
-            $table->string('band');
+            $table->string('band')->nullable();
             $table->unsignedBigInteger('entity_id');
             $table->string('assessee_type');
             $table->timestamps();

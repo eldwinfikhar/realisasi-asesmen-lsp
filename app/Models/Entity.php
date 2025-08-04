@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Entity extends Model
 {
+    use HasFactory;
+
+    protected $fillable = ['name'];
     public function users()
     {
         return $this->hasMany(User::class, 'entity_id');

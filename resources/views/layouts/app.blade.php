@@ -11,6 +11,7 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900 min-h-screen">
     <div class="flex min-h-screen">
@@ -27,5 +28,6 @@
             </main>
         </div>
     </div>
+    @stack('scripts')
 </body>
 </html>

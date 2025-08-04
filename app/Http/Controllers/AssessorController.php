@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+
 use Illuminate\Http\Request;
+use App\Models\Assessor;
+use App\Models\Assessment;
 
 class AssessorController extends Controller
 {
@@ -13,9 +16,41 @@ class AssessorController extends Controller
      */
     public function index()
     {
-        // Query all assessors with their assessment count (report logic)
-        $assessors = \App\Models\Assessor::withCount('assessments')->get();
-        return response(view('pages.laporan-asesor', compact('assessors')));
+        // 1. Get available years from assessments table
+        $availableYears = Assessment::query()->selectRaw('DISTINCT strftime("%Y", assessment_date) as year')->orderByDesc('year')->pluck('year');
+
+        // 2. Get selected year from request
+        $selectedYear = request('year', $availableYears->first());
+
+        // 3. Fetch and paginate assessors
+        // 3. Get sort and direction from request
+        $sort = request('sort', 'name');
+        $direction = request('direction', 'asc');
+        $allowedSorts = ['name', 'assessments_count'];
+        $allowedDirections = ['asc', 'desc'];
+        if (!in_array($sort, $allowedSorts)) $sort = 'name';
+        if (!in_array($direction, $allowedDirections)) $direction = 'asc';
+
+        // 4. Fetch assessors with sorting
+        $assessors = Assessor::withCount(['assessments as assessments_count' => function($query) use ($selectedYear) {
+            if (!empty($selectedYear)) {
+                $query->whereYear('assessment_date', $selectedYear);
+            }
+        }])
+        ->when(request('search'), function($q) {
+            $q->where('name', 'like', '%' . request('search') . '%');
+        })
+        ->orderBy($sort, $direction)
+        ->get();
+
+        // 5. Pass to view
+        return response(view('pages.laporan-asesor', [
+            'assessors' => $assessors,
+            'availableYears' => $availableYears,
+            'selectedYear' => $selectedYear,
+            'sort' => $sort,
+            'direction' => $direction
+        ]));
     }
 
     /**
@@ -25,7 +60,8 @@ class AssessorController extends Controller
      */
     public function create()
     {
-        return response(view('assessors.create'));
+        $assessor = new Assessor();
+        return response(view('assessors.form', compact('assessor')));
     }
 
     /**
@@ -36,13 +72,11 @@ class AssessorController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:assessors,email',
         ]);
-
-        \App\Models\Assessor::create($request->all());
-        return response(redirect()->route('assessors.index')->with('success', 'Assessor created successfully.'));
+        Assessor::create($validated);
+        return response(redirect()->route('assessors.index')->with('success', 'Data asesor berhasil ditambahkan.'));
     }
 
     /**
@@ -53,7 +87,7 @@ class AssessorController extends Controller
      */
     public function show($id)
     {
-        $assessor = \App\Models\Assessor::withCount('assessments')->findOrFail($id);
+        $assessor = Assessor::withCount('assessments')->findOrFail($id);
         return response(view('assessors.show', compact('assessor'))); 
     }
 
@@ -63,10 +97,9 @@ class AssessorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Assessor $assessor)
     {
-        $assessor = \App\Models\Assessor::findOrFail($id);
-        return response(view('assessors.edit', compact('assessor')));
+        return response(view('assessors.form', compact('assessor')));
     }
 
     /**
@@ -76,15 +109,13 @@ class AssessorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Assessor $assessor)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:assessors,email,' . $id,
         ]);
-        $assessor = \App\Models\Assessor::findOrFail($id);
-        $assessor->update($request->all());
-        return response(redirect()->route('assessors.index')->with('success', 'Assessor updated successfully.'));
+        $assessor->update($validated);
+        return response(redirect()->route('assessors.index')->with('success', 'Data asesor berhasil diperbarui.'));
     }
 
     /**
@@ -93,10 +124,9 @@ class AssessorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Assessor $assessor)
     {
-        $assessor = \App\Models\Assessor::findOrFail($id);
         $assessor->delete();
-        return response(redirect()->route('assessors.index')->with('success', 'Assessor deleted successfully.'));
+        return response(redirect()->route('assessors.index')->with('success', 'Data asesor berhasil dihapus.'));
     }
 }

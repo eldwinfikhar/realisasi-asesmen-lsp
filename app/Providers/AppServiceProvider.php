@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Blade;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register icon components manually for dynamic usage
+        Blade::component('components.icons.users', 'icon-users');
+        Blade::component('components.icons.clipboard-list', 'icon-clipboard-list');
+        Blade::component('components.icons.user-check', 'icon-user-check');
+        Blade::component('components.icons.bookmark-alt', 'icon-bookmark-alt');
+        Blade::component('components.icons.check-circle', 'icon-check-circle');
     }
 }

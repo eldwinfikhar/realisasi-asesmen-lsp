@@ -1,38 +1,39 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AssessmentController;
+use App\Http\Controllers\AssesseeController;
+use App\Http\Controllers\AssessorController;
+use App\Http\Controllers\RekapBandController;
+use App\Http\Controllers\SchemeController;
+use App\Http\Controllers\TargetRealisasiController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('auth.login');
 });
 
-Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::middleware('auth')->group(function () {
+        Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/daftar-asesi', function () {
-        return view('pages.daftar-asesi');
-    })->name('asesi.index');
+        // --- Special Assessment Routes ---
+        Route::get('/assessments/external', [AssessmentController::class, 'indexExternal'])->name('assessments.indexExternal');
+        Route::get('/assessments/external/create', [AssessmentController::class, 'createExternal'])->name('assessments.createExternal');
+        Route::post('/assessments/external', [AssessmentController::class, 'storeExternal'])->name('assessments.storeExternal');
+        Route::get('/assessments/external/{assessment}/edit', [AssessmentController::class, 'editExternal'])->name('assessments.editExternal');
+        Route::put('/assessments/external/{assessment}', [AssessmentController::class, 'updateExternal'])->name('assessments.updateExternal');
+        Route::delete('/assessments/external/{assessment}', [AssessmentController::class, 'destroyExternal'])->name('assessments.destroyExternal');
 
-    Route::get('/laporan-asesor', [\App\Http\Controllers\AssessorController::class, 'index'])->name('laporan.asesor');
+        // --- Resource Controllers ---
+        Route::resource('assessees', AssesseeController::class);
+        Route::resource('assessors', AssessorController::class);
+        Route::resource('assessments', AssessmentController::class); // Ini sekarang di bawah rute spesifik
 
-    Route::get('/laporan-skema', function () {
-        return view('pages.laporan-skema');
-    })->name('laporan.skema');
-
-    Route::get('/rekap-per-band', function () {
-        return view('reports.rekap-band');
-    })->name('laporan.rekap-band');
-
-    Route::get('/target-realisasi', function () {
-        return view('reports.target-realisasi');
-    })->name('laporan.target-realisasi');
-
-    Route::get('/assessments/create', [App\Http\Controllers\AssessmentController::class, 'create'])->name('assessments.create');
-    Route::resource('assessments', App\Http\Controllers\AssessmentController::class);
-});
+        // --- Scheme Resource Route ---
+        Route::resource('schemes', SchemeController::class);
+        Route::get('/laporan/rekap-band', [RekapBandController::class, 'index'])->name('laporan.rekap-band');
+        Route::get('/laporan/target-realisasi', [TargetRealisasiController::class, 'index'])->name('laporan.target-realisasi');
+    });
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
