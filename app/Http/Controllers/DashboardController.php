@@ -103,13 +103,15 @@ class DashboardController extends Controller
             })
             ->with('assessee.entity')
             ->get()
+            ->filter(function($a) {
+                return optional($a->assessee)->assessee_type === 'Internal';
+            })
             ->groupBy(function($a) {
                 return optional($a->assessee->entity)->name ?? 'Tanpa Entitas';
             })
             ->map(function($group) {
                 return $group->count();
-            }
-        );
+            });
 
         // --- Monthly Progress Table ---
         $annualTargets = $this->getAnnualTargets($year);

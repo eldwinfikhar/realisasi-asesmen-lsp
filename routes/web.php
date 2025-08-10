@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\AssesseeController;
 use App\Http\Controllers\AssessorController;
@@ -13,27 +14,27 @@ Route::get('/', function () {
     return view('auth.login');
 });
 
-    Route::middleware('auth')->group(function () {
-        Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        // --- Special Assessment Routes ---
-        Route::get('/assessments/external', [AssessmentController::class, 'indexExternal'])->name('assessments.indexExternal');
-        Route::get('/assessments/external/create', [AssessmentController::class, 'createExternal'])->name('assessments.createExternal');
-        Route::post('/assessments/external', [AssessmentController::class, 'storeExternal'])->name('assessments.storeExternal');
-        Route::get('/assessments/external/{assessment}/edit', [AssessmentController::class, 'editExternal'])->name('assessments.editExternal');
-        Route::put('/assessments/external/{assessment}', [AssessmentController::class, 'updateExternal'])->name('assessments.updateExternal');
-        Route::delete('/assessments/external/{assessment}', [AssessmentController::class, 'destroyExternal'])->name('assessments.destroyExternal');
+    // --- Special Assessment Routes ---
+    Route::get('/assessments/external', [AssessmentController::class, 'indexExternal'])->name('assessments.indexExternal');
+    Route::get('/assessments/external/create', [AssessmentController::class, 'createExternal'])->name('assessments.createExternal');
+    Route::post('/assessments/external', [AssessmentController::class, 'storeExternal'])->name('assessments.storeExternal');
+    Route::get('/assessments/external/{assessment}/edit', [AssessmentController::class, 'editExternal'])->name('assessments.editExternal');
+    Route::put('/assessments/external/{assessment}', [AssessmentController::class, 'updateExternal'])->name('assessments.updateExternal');
+    Route::delete('/assessments/external/{assessment}', [AssessmentController::class, 'destroyExternal'])->name('assessments.destroyExternal');
 
-        // --- Resource Controllers ---
-        Route::resource('assessees', AssesseeController::class);
-        Route::resource('assessors', AssessorController::class);
-        Route::resource('assessments', AssessmentController::class); // Ini sekarang di bawah rute spesifik
+    // --- Resource Controllers ---
+    Route::resource('assessees', AssesseeController::class);
+    Route::resource('assessors', AssessorController::class);
+    Route::resource('assessments', AssessmentController::class);
+    Route::resource('schemes', SchemeController::class);
 
-        // --- Scheme Resource Route ---
-        Route::resource('schemes', SchemeController::class);
-        Route::get('/laporan/rekap-band', [RekapBandController::class, 'index'])->name('laporan.rekap-band');
-        Route::get('/laporan/target-realisasi', [TargetRealisasiController::class, 'index'])->name('laporan.target-realisasi');
-    });
+    // --- Report Pages Routes ---
+    Route::get('/laporan/rekap-band', [RekapBandController::class, 'index'])->name('laporan.rekap-band');
+    Route::get('/laporan/target-realisasi', [TargetRealisasiController::class, 'index'])->name('laporan.target-realisasi');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

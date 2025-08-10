@@ -3,19 +3,28 @@
 @section('content')
 <div class="max-w-[1440px] mx-auto p-6">
     {{-- Filter Section --}}
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex justify-end items-center mb-6 gap-4">
         <form method="GET" class="flex flex-col sm:flex-row gap-4 items-center">
             <input type="text" name="search" placeholder="Cari asesor..." value="{{ request('search') }}" class="w-full sm:w-64 px-4 py-2 border border-gray-300 dark:border-gray-700 rounded focus:ring-blue-500 dark:bg-gray-900 dark:text-gray-100" />
-            <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded shadow">Filter</button>
+            <label class="inline-flex items-center cursor-pointer">
+                <input type="checkbox" name="show_unused" value="1" class="form-checkbox h-5 w-5 text-blue-600 rounded" {{ request('show_unused') ? 'checked' : '' }}>
+                <span class="ml-2 text-gray-700 dark:text-gray-200 whitespace-nowrap">Tampilkan hanya yang tak menguji</span>
+            </label>
+            <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded shadow">Filter</button>
         </form>
         <a href="{{ route('assessors.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded shadow">
             Tambah Data Asesor +
         </a>
     </div>
 
-    {{-- Tabel Performa Asesor + CRUD --}}
+    {{-- Tabel Performa Asesor --}}
     <div>
         <h1 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">Daftar Asesor</h1>
+        @if(session('success'))
+            <div class="mb-6 p-4 rounded bg-green-100 border border-green-300 text-green-800">
+                {{ session('success') }}
+            </div>
+        @endif
         <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded shadow">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-300 dark:bg-gray-700">
@@ -28,7 +37,7 @@
                                 @endif
                             </a>
                         </th>
-                        <th class="px-24 py-3 text-center text-md font-medium dark:text-gray-300 uppercase tracking-wider">
+                        <th class="px-24 py-3 text-left text-md font-medium dark:text-gray-300 uppercase tracking-wider">
                             <a href="{{ request()->fullUrlWithQuery(['sort' => 'assessments_count', 'direction' => ($sort == 'assessments_count' && $direction == 'asc') ? 'desc' : 'asc']) }}" class="hover:underline flex items-center gap-1">
                                 Jumlah Asesmen
                                 @if(isset($sort) && $sort == 'assessments_count')
@@ -52,7 +61,7 @@
                     @forelse ($filteredAssessors as $assessor)
                         <tr>
                             <td class="px-6 py-4 text-lg whitespace-nowrap">{{ $assessor->name }}</td>
-                            <td class="px-24 py-4 text-lg whitespace-nowrap">{{ $assessor->assessments_count ?? 0 }}</td>
+                            <td class="pl-40 py-4 text-lg whitespace-nowrap">{{ $assessor->assessments_count ?? 0 }}</td>
                             <td class="px-6 py-4 text-center text-lg whitespace-nowrap">
                                 @if (($assessor->assessments_count ?? 0) > 5)
                                     <span class="px-2 py-1 rounded bg-green-100 text-green-800">Tercapai</span>

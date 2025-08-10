@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Assessee;
 use App\Models\Entity;
+use Illuminate\Validation\Rule;
 
 class AssesseeController extends Controller
 {
@@ -70,13 +71,32 @@ class AssesseeController extends Controller
     public function store(Request $request)
     {
         // Validate all required fields
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'band' => 'required|string|max:50',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('assessees')
+                    ->where(function ($query) use ($request) {
+                        $query->where('band', $request->band)
+                              ->where('entity_id', $request->entity_id)
+                              ->where('location', $request->location);
+                    }),
+            ],
+            'band' => 'required_if:assessee_type,Internal|string|max:50',
             'entity_id' => 'required|exists:entities,id',
             'assessee_type' => 'required|in:Internal,Eksternal',
-            'location' => 'nullable|string|max:255',
+            'location' => 'required_if:assessee_type,Eksternal|string|max:255',
         ]);
+
+        // Explicitly nullify unused fields
+        if ($validated['assessee_type'] === 'Internal') {
+            $validated['location'] = null;
+        }
+        if ($validated['assessee_type'] === 'Eksternal') {
+            $validated['band'] = null;
+        }
 
         Assessee::create($validated);
 
@@ -102,13 +122,33 @@ class AssesseeController extends Controller
     // Update the specified resource in storage.
     public function update(Request $request, Assessee $assessee)
     {
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'band' => 'required|string|max:50',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('assessees')
+                    ->where(function ($query) use ($request) {
+                        $query->where('band', $request->band)
+                              ->where('entity_id', $request->entity_id)
+                              ->where('location', $request->location);
+                    })
+                    ->ignore($assessee->id),
+            ],
+            'band' => 'required_if:assessee_type,Internal|string|max:50',
             'entity_id' => 'required|exists:entities,id',
             'assessee_type' => 'required|in:Internal,Eksternal',
-            'location' => 'nullable|string|max:255',
+            'location' => 'required_if:assessee_type,Eksternal|string|max:255',
         ]);
+
+        // Explicitly nullify unused fields
+        if ($validated['assessee_type'] === 'Internal') {
+            $validated['location'] = null;
+        }
+        if ($validated['assessee_type'] === 'Eksternal') {
+            $validated['band'] = null;
+        }
 
         $assessee->update($validated);
 

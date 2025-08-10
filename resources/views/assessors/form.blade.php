@@ -17,10 +17,11 @@
                 <div class="text-red-600 text-sm mt-1">{{ $message }}</div>
             @enderror
         </div>
-        <div class="flex justify-end">
+        <div class="flex justify-end gap-2">
             <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded shadow">
-                {{ isset($assessor) && $assessor->exists ? 'Update' : 'Simpan' }}
+                {{ isset($assessor) && $assessor->exists ? 'Perbarui' : 'Simpan' }}
             </button>
+            <a href="{{ route('assessors.index') }}" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded shadow">Batal</a>
         </div>
     </form>
 </div>

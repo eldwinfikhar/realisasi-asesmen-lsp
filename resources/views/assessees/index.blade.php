@@ -23,7 +23,7 @@
     {{-- Filter Section --}}
     <div class="flex justify-end items-center mb-6 gap-4">
         <form method="GET" class="flex flex-col sm:flex-row gap-4 items-center">
-            <input type="text" name="filter_value" value="{{ request('filter_value') ?? '' }}" placeholder="Cari asesi internal..." class="w-full sm:w-64 px-4 py-2 border border-gray-300 dark:border-gray-700 rounded focus:ring-blue-500 dark:bg-gray-900 dark:text-gray-100" />
+            <input type="text" name="filter_value" value="{{ request('filter_value') ?? '' }}" placeholder="Cari asesi..." class="w-full sm:w-64 px-4 py-2 border border-gray-300 dark:border-gray-700 rounded focus:ring-blue-500 dark:bg-gray-900 dark:text-gray-100" />
             <select name="filter_by" class="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded focus:ring-blue-500 dark:bg-gray-900 dark:text-gray-100">
                 <option value="name" @if(request('filter_by') == 'name') selected @endif>Nama Lengkap</option>
                 <option value="entity" @if(request('filter_by') == 'entity') selected @endif>Entitas</option>
@@ -37,8 +37,13 @@
     </div>
 
     {{-- Tabel Asesi INTERNAL --}}
-    <div class="">
+    <div>
         <h1 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">Daftar Asesi Internal</h1>
+        @if(session('success'))
+            <div class="mb-6 p-4 rounded bg-green-100 border border-green-300 text-green-800">
+                {{ session('success') }}
+            </div>
+        @endif
         @if($internalAssessees->isNotEmpty())
             <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded shadow">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -57,18 +62,22 @@
                             <td class="px-6 py-4 text-lg whitespace-nowrap">{{ $assessee->entity ? $assessee->entity->name : '-' }}</td>
                             <td class="px-9 py-4 text-lg whitespace-nowrap">{{ $assessee->band }}</td>
                             <td class="px-6 py-4 text-lg whitespace-nowrap flex gap-2">
-                                <button class="px-2 py-2 bg-yellow-400 hover:bg-yellow-500 text-white rounded text-xs flex items-center justify-center" title="Edit">
+                                <a href="{{ route('assessees.edit', $assessee->id) }}" class="px-2 py-2 bg-yellow-400 hover:bg-yellow-500 text-white rounded text-xs flex items-center justify-center" title="Edit">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 3.487a2.06 2.06 0 0 1 2.92 2.91l-9.8 9.8a2 2 0 0 1-.878.51l-3.4.85a.5.5 0 0 1-.61-.62l.85-3.4a2 2 0 0 1 .51-.88l9.8-9.8z" />
                                     </svg>
                                     <span class="ml-1">Edit</span>
-                                </button>
-                                <button class="px-2 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-xs flex items-center justify-center" title="Delete">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3m2 0v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7h12z" />
-                                    </svg>
-                                    <span class="ml-1">Hapus</span>
-                                </button>
+                                </a>
+                                <form action="{{ route('assessees.destroy', $assessee->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data ini?')" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="px-2 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-xs flex items-center justify-center" title="Hapus">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 7h12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3m2 0v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7h12z" />
+                                        </svg>
+                                        <span class="ml-1">Hapus</span>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         @endforeach

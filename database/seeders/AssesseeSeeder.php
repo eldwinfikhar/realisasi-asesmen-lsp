@@ -21,13 +21,14 @@ class AssesseeSeeder extends Seeder
             return;
         }
 
-        // 1. 250 Internal assessees: random band, random city location
-        Assessee::factory()->count(250)->state(function () {
+        // 1. 250 Internal assessees: random band, random city location, exclude 'Kimia Farma'
+        $internalEntities = Entity::where('name', '!=', 'Kimia Farma')->get();
+        Assessee::factory()->count(250)->state(function () use ($internalEntities) {
             return [
                 'assessee_type' => 'Internal',
                 'band'          => fake()->randomElement(['I', 'II', 'III', 'IV', 'V']),
                 'location'      => null,
-                'entity_id'     => Entity::all()->random()->id,
+                'entity_id'     => $internalEntities->random()->id,
             ];
         })->create();
 

@@ -27,14 +27,14 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
     <!-- Realisasi vs Target Line Chart -->
     <div class="bg-white dark:bg-gray-800 rounded shadow p-6 flex flex-col h-full">
-        <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Tren Realisasi vs Target Asesmen</h2>
+        <h1 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Tren Realisasi vs Target Asesmen</h1>
         <div class="flex-grow relative" style="height:400px; min-height:320px;">
             <canvas id="assessmentTrendsChart" height="380"></canvas>
         </div>
     </div>
     <!-- Internal vs Eksternal Line Chart -->
     <div class="bg-white dark:bg-gray-800 rounded shadow p-6 flex flex-col h-full">
-        <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Tren Asesmen Internal vs Eksternal</h2>
+        <h1 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Tren Asesmen Internal vs Eksternal</h1>
         <div class="flex-grow relative" style="height:400px; min-height:320px;">
             <canvas id="internalExternalChart" height="380"></canvas>
         </div>
@@ -42,16 +42,16 @@
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-    <!-- Komposisi Entitas Pie Chart -->
+    <!-- Komposisi Entitas Asesmen Internal Pie Chart -->
     <div class="bg-white dark:bg-gray-800 rounded shadow p-6 flex flex-col h-full">
-        <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Komposisi Entitas</h2>
+        <h1 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Komposisi Entitas Asesmen Internal</h1>
         <div class="flex-grow relative" style="height:400px; min-height:320px;">
             <canvas id="targetRealizationChart" height="380"></canvas>
         </div>
     </div>
     <!-- Distribusi Lingkup Pie Chart -->
     <div class="bg-white dark:bg-gray-800 rounded shadow p-6 flex flex-col h-full">
-        <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Sebaran Asesmen per Lingkup</h2>
+        <h1 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Sebaran Asesmen per Lingkup</h1>
         <div class="flex-grow relative" style="height:400px; min-height:320px;">
             <canvas id="scopeDistributionData" height="380"></canvas>
         </div>
@@ -59,7 +59,7 @@
 </div>
 
 <div class="bg-white dark:bg-gray-800 rounded shadow p-6">
-    <h1 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">Persentase Progres Asesmen per Bulan</h1>
+    <h1 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Persentase Progres Asesmen per Bulan</h1>
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-300 dark:bg-gray-700">
@@ -135,7 +135,7 @@
                     {
                         label: 'Target',
                         data: monthlyTargets,
-                        borderColor: '#6b7280', // gray-500
+                        borderColor: '#6b7280',
                         backgroundColor: 'rgba(107,114,128,0.1)',
                         fill: false,
                         tension: 0.3,
@@ -178,7 +178,7 @@
                     {
                         label: 'Eksternal',
                         data: internalExternalChart.eksternal,
-                        borderColor: '#22c55e', // green-500
+                        borderColor: '#22c55e',
                         backgroundColor: 'rgba(34,197,94,0.1)',
                         fill: false,
                         tension: 0.3,
@@ -207,7 +207,7 @@
                 datasets: [{
                     data: targetRealizationChart.data,
                     backgroundColor: [
-                        '#2563eb', '#22d3ee', '#f59e42', '#f43f5e', '#a3e635', '#fbbf24', '#6366f1', '#14b8a6', '#eab308', '#f472b6', '#818cf8', '#f87171'
+                        '#1e40af','#0e7490','#ea580c','#be123c','#4d7c0f','#b45309','#4338ca','#0f766e','#a16207','#a21caf','#3730a3','#b91c1c'
                     ]
                 }]
             },
@@ -215,7 +215,12 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'bottom' },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { size: 18 }
+                        }
+                    },
                     datalabels: {
                         formatter: (value, context) => {
                             const data = context.chart.data.datasets[0].data;
@@ -224,7 +229,7 @@
                             return percent + '%';
                         },
                         color: '#fff',
-                        font: { weight: 'bold' }
+                        font: { weight: 'bold', size: '14px' }
                     }
                 }
             },
@@ -241,7 +246,7 @@
                 datasets: [{
                     data: Object.values(scopeDistributionData),
                     backgroundColor: [
-                        '#2563eb', '#22d3ee', '#f59e42', '#f43f5e', '#a3e635', '#fbbf24', '#6366f1', '#14b8a6', '#eab308', '#f472b6', '#818cf8', '#f87171'
+                        '#1e40af','#0e7490','#ea580c','#be123c','#4d7c0f'
                     ]
                 }]
             },
@@ -249,7 +254,12 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'bottom' },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { size: 18 }
+                        }
+                    },
                     datalabels: {
                         formatter: (value, context) => {
                             const data = context.chart.data.datasets[0].data;

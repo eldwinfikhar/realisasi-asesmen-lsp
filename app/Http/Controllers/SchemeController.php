@@ -15,6 +15,7 @@ class SchemeController extends Controller
         $selectedYear = request('year', $availableYears->first());
         $selectedScope = request('scope', '');
         $showUnused = request('show_unused');
+        $search = request('search', '');
         $sort = request('sort', 'name');
         $direction = request('direction', 'asc');
         $allowedSorts = ['name', 'scope', 'assessments_count'];
@@ -34,6 +35,9 @@ class SchemeController extends Controller
                 }
             });
         })
+        ->when($search, function($q) use ($search) {
+            $q->where('name', 'like', "%$search%");
+        })
         ->orderBy($sort, $direction)
         ->get();
         return view('schemes.index', [
@@ -43,6 +47,7 @@ class SchemeController extends Controller
             'selectedYear' => $selectedYear,
             'selectedScope' => $selectedScope,
             'showUnused' => $showUnused,
+            'search' => $search,
             'sort' => $sort,
             'direction' => $direction,
         ]);
@@ -61,7 +66,7 @@ class SchemeController extends Controller
             'scope' => 'required|string|max:255',
         ]);
         $scheme = Scheme::create($validated);
-        return redirect()->route('schemes.index')->with('success', 'Scheme created successfully.');
+        return redirect()->route('schemes.index')->with('success', 'Data skema berhasil ditambahkan.');
     }
 
     public function edit(Scheme $scheme)
@@ -76,12 +81,12 @@ class SchemeController extends Controller
             'scope' => 'required|string|max:255',
         ]);
         $scheme->update($validated);
-        return redirect()->route('schemes.index')->with('success', 'Scheme updated successfully.');
+        return redirect()->route('schemes.index')->with('success', 'Data skema berhasil diperbarui.');
     }
 
     public function destroy(Scheme $scheme)
     {
         $scheme->delete();
-        return redirect()->route('schemes.index')->with('success', 'Scheme deleted successfully.');
+        return redirect()->route('schemes.index')->with('success', 'Data skema berhasil dihapus.');
     }
 }
