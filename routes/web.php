@@ -10,6 +10,11 @@ use App\Http\Controllers\SchemeController;
 use App\Http\Controllers\TargetRealisasiController;
 use Illuminate\Support\Facades\Route;
 
+// Railway health check endpoint
+Route::get('/up', function () {
+    return response('OK', 200);
+});
+
 Route::get('/', function () {
     return view('auth.login');
 });

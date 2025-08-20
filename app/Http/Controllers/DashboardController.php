@@ -70,7 +70,6 @@ class DashboardController extends Controller
         $targetCompletion = $internalTarget > 0 ? round(($internalAssessments / $internalTarget) * 100, 2) : 0;
 
         // --- Charts ---
-        // monthlyRealisations: total assessments for each month (1-12)
         $monthlyRealisations = [];
         $monthlyTargets = [];
         $internalMonthlyCounts = [];
@@ -96,18 +95,26 @@ class DashboardController extends Controller
                 ->count();
         }
 
-        // entityCompositionData: count of internal assessees for each entity
+        // --- Internal Assessee Distribution by Entity ---
         $entityCompositionData = Assessment::whereYear('assessment_date', $year)
             ->whereHas('assessee', function($q) {
                 $q->where('assessee_type', 'Internal');
             })
             ->with('assessee.entity')
             ->get()
-            ->filter(function($a) {
-                return optional($a->assessee)->assessee_type === 'Internal';
-            })
             ->groupBy(function($a) {
                 return optional($a->assessee->entity)->name ?? 'Tanpa Entitas';
+            })
+            ->map(function($group) {
+                return $group->count();
+            });
+
+        // --- Assessment Distribution by Scope ---
+        $scopeDistributionData = Assessment::whereYear('assessment_date', $year)
+            ->with('scheme')
+            ->get()
+            ->groupBy(function($a) {
+                return optional($a->scheme)->scope ?? 'Tanpa Skema';
             })
             ->map(function($group) {
                 return $group->count();
@@ -123,7 +130,7 @@ class DashboardController extends Controller
             })
             ->get()
             ->groupBy(function($a) {
-                if ($a->assessment_date instanceof \Carbon\Carbon) {
+                if ($a->assessment_date instanceof Carbon) {
                     return (int)$a->assessment_date->format('n');
                 } else {
                     return (int)date('n', strtotime((string)$a->assessment_date));
@@ -137,7 +144,7 @@ class DashboardController extends Controller
             })
             ->get()
             ->groupBy(function($a) {
-                if ($a->assessment_date instanceof \Carbon\Carbon) {
+                if ($a->assessment_date instanceof Carbon) {
                     return (int)$a->assessment_date->format('n');
                 } else {
                     return (int)date('n', strtotime((string)$a->assessment_date));
@@ -188,17 +195,6 @@ class DashboardController extends Controller
             'labels' => array_keys($entityCompositionData->toArray()),
             'data' => array_values($entityCompositionData->toArray()),
         ];
-
-        // --- Assessment Distribution by Scope (for new pie chart) ---
-        $scopeDistributionData = Assessment::whereYear('assessment_date', $year)
-            ->with('scheme')
-            ->get()
-            ->groupBy(function($a) {
-                return optional($a->scheme)->scope ?? 'Tanpa Skema';
-            })
-            ->map(function($group) {
-                return $group->count();
-            });
 
         return view('dashboard', compact(
             'availableYears',
