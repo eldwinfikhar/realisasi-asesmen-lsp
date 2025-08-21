@@ -16,6 +16,7 @@ class AssessmentTarget extends Model
         'month',
         'target_count',
         'entity_id',
+        'location'
     ];
 
     public function entity()

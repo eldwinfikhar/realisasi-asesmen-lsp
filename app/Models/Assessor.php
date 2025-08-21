@@ -9,7 +9,7 @@ class Assessor extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'registration_number'];
+    protected $fillable = ['name'];
     public function assessments()
     {
         return $this->hasMany(Assessment::class, 'assessor_id');

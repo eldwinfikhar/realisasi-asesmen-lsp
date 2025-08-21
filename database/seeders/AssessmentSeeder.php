@@ -41,7 +41,7 @@ class AssessmentSeeder extends Seeder
                 'assessment_date' => $assessmentDate,
                 'pre_assessment_venue' => fake()->city(),
                 'assessment_venue' => fake()->city(),
-                'notes' => fake()->sentence(),
+                'notes' => fake()->text(10),
             ]);
         }
     }

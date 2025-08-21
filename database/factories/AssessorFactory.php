@@ -18,7 +18,6 @@ class AssessorFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'registration_number' => $this->faker->unique()->numerify('########'),
         ];
     }
 }

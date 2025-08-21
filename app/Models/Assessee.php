@@ -13,7 +13,8 @@ class Assessee extends Model
         'name',
         'band',
         'entity_id',
-        'assessee_type', // Assuming this is a field to differentiate internal/external assessee
+        'assessee_type',
+        'location'
     ];
     /**
      * Get the entity that owns the assessee.

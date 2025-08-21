@@ -17,6 +17,7 @@ class Assessment extends Model
         'pre_assessment_venue',
         'assessment_date',
         'assessment_venue',
+        'notes'
     ];
 
     /**
