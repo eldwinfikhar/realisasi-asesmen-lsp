@@ -31,7 +31,7 @@ class DashboardController extends Controller
     {
         // Get all available years from assessments table
         $availableYears = Assessment::query()
-            ->selectRaw('DISTINCT strftime("%Y", assessment_date) as year')
+            ->selectRaw('DISTINCT YEAR(assessment_date) as year')
             ->orderByDesc('year')
             ->pluck('year');
 

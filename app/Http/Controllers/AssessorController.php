@@ -18,7 +18,7 @@ class AssessorController extends Controller
     public function index()
     {
         // 1. Get available years from assessments table
-        $availableYears = Assessment::query()->selectRaw('DISTINCT strftime("%Y", assessment_date) as year')->orderByDesc('year')->pluck('year');
+        $availableYears = Assessment::query()->selectRaw('DISTINCT YEAR(assessment_date) as year')->orderByDesc('year')->pluck('year');
 
         // 2. Get selected year from request
         $selectedYear = request('year', $availableYears->first());

@@ -10,7 +10,7 @@ class SchemeController extends Controller
 {
     public function index()
     {
-        $availableYears = Assessment::query()->selectRaw('DISTINCT strftime("%Y", assessment_date) as year')->orderByDesc('year')->pluck('year');
+        $availableYears = Assessment::query()->selectRaw('DISTINCT YEAR(assessment_date) as year')->orderByDesc('year')->pluck('year');
         $availableScopes = Scheme::select('scope')->distinct()->pluck('scope');
         $selectedYear = request('year', $availableYears->first());
         $selectedScope = request('scope', '');
