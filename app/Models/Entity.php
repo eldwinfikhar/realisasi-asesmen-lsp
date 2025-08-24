@@ -19,4 +19,9 @@ class Entity extends Model
     {
         return $this->hasMany(AssessmentTarget::class, 'entity_id');
     }
+
+    public function assessees()
+    {
+        return $this->hasMany(Assessee::class, 'entity_id');
+    }
 }

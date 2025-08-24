@@ -21,7 +21,7 @@ class Assessee extends Model
      */
     public function entity()
     {
-        return $this->belongsTo(Entity::class);
+        return $this->belongsTo(Entity::class, 'entity_id');
     }
 
     /**
@@ -29,6 +29,6 @@ class Assessee extends Model
      */
     public function assessments()
     {
-        return $this->hasMany(Assessment::class);
+        return $this->hasMany(Assessment::class, 'assessee_id');
     }
 }
