@@ -72,23 +72,19 @@ class AssesseeController extends Controller
     {
         // Validate all required fields
 
-        $validated = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('assessees')
-                    ->where(function ($query) use ($request) {
-                        $query->where('band', $request->band)
-                              ->where('entity_id', $request->entity_id)
-                              ->where('location', $request->location);
-                    }),
-            ],
-            'band' => 'required_if:assessee_type,Internal|string|max:50',
-            'entity_id' => 'required|exists:entities,id',
-            'assessee_type' => 'required|in:Internal,Eksternal',
-            'location' => 'required_if:assessee_type,Eksternal|string|max:255',
-        ]);
+$validated = $request->validate([
+    'name' => [
+        'required',
+        'string',
+        'max:255',
+        Rule::unique('assessees')
+            ->where('entity_id', $request->input('entity_id')),
+    ],
+    'band' => 'nullable|required_if:assessee_type,Internal|string|max:50',
+    'entity_id' => 'required|exists:entities,id',
+    'assessee_type' => 'required|in:Internal,Eksternal',
+    'location' => 'nullable|required_if:assessee_type,Eksternal|string|max:255'
+]);
 
         // Explicitly nullify unused fields
         if ($validated['assessee_type'] === 'Internal') {
@@ -125,21 +121,17 @@ class AssesseeController extends Controller
 
         $validated = $request->validate([
             'name' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('assessees')
-                    ->where(function ($query) use ($request) {
-                        $query->where('band', $request->band)
-                              ->where('entity_id', $request->entity_id)
-                              ->where('location', $request->location);
-                    })
-                    ->ignore($assessee->id),
-            ],
-            'band' => 'required_if:assessee_type,Internal|string|max:50',
+        'required',
+        'string',
+        'max:255',
+        Rule::unique('assessees')
+            ->where('entity_id', $request->input('entity_id'))
+            ->ignore($assessee->id),
+    ],
+            'band' => 'nullable|required_if:assessee_type,Internal|string|max:50',
             'entity_id' => 'required|exists:entities,id',
             'assessee_type' => 'required|in:Internal,Eksternal',
-            'location' => 'required_if:assessee_type,Eksternal|string|max:255',
+            'location' => 'nullable|required_if:assessee_type,Eksternal|string|max:255',
         ]);
 
         // Explicitly nullify unused fields
