@@ -86,11 +86,11 @@ class ImportAssessees extends Command
                 // 9. Proses create/update dengan 2 ternary operator.
                 Assessee::updateOrCreate(
                     [
-                        'name' => $assesseeName,
+                        'name'      => $assesseeName,
+                        'entity_id' => $entity->id,
                     ],
                     [
                         'assessee_type' => $assesseeType,
-                        'entity_id'     => $entity->id,
                         'band'          => !empty($band) ? $band : null,
                         'location'      => !empty($location) ? $location : null,
                     ]

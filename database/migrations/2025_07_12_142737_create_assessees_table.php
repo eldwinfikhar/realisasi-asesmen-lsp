@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('assessee_type');
             $table->timestamps();
 
+            $table->unique(['name', 'entity_id']);
             $table->foreign('entity_id')->references('id')->on('entities')->onDelete('cascade');
         });
     }
