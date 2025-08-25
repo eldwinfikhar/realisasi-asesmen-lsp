@@ -15,35 +15,18 @@ class AssessmentController extends Controller
      * Centralized validation for assessment data.
      * Validates 'band' for internal, 'location' for external.
      */
-    private function validateAssessmentData(Request $request, ?Assessment $assessment = null)
+    private function validatedData(Request $request, ?Assessment $assessment = null)
     {
-        // Determine assessee type
-        $assessee = null;
-        if ($request->has('assessee_id')) {
-            $assessee = Assessee::find($request->input('assessee_id'));
-        } else if ($assessment) {
-            $assessee = $assessment->assessee ?? null;
-        }
-        $assesseeType = $assessee->assessee_type ?? null;
-
-        $rules = [
+         return $request->validate([
             'assessee_id' => 'required|exists:assessees,id',
             'assessor_id' => 'required|exists:assessors,id',
             'scheme_id' => 'required|exists:schemes,id',
             'pre_assessment_date' => 'required|date',
             'pre_assessment_venue' => 'required|string|max:255',
-            'assessment_date' => 'required|date',
+            'assessment_date' => 'required|date|after_or_equal:pre_assessment_date',
             'assessment_venue' => 'required|string|max:255',
             'notes' => 'nullable|string|max:1000',
-        ];
-
-        if ($assesseeType === 'Internal') {
-            $rules['band'] = 'required|string|max:255';
-        } elseif ($assesseeType === 'Eksternal') {
-            $rules['location'] = 'nullable|string|max:255';
-        }
-
-        return $request->validate($rules);
+        ]);
     }
     /**
      * Display a listing of the external assessments.
@@ -74,12 +57,14 @@ class AssessmentController extends Controller
             ->orderBy('assessment_date', 'asc')
             ->orderBy('pre_assessment_date', 'asc')
             ->get();
+        
+        dd($assessments);
 
         // 4. Group by month number (1-12)
         $assessmentsByMonthRaw = $assessments->groupBy(function ($assessment) {
             if (!$assessment->assessment_date) return null;
             $date = $assessment->assessment_date;
-            if (!$date instanceof \Carbon\Carbon) {
+            if (!$date instanceof Carbon) {
                 $date = Carbon::parse((string)$date);
             }
             return (int)$date->month;
@@ -131,7 +116,7 @@ class AssessmentController extends Controller
         $assessmentsByMonthRaw = $assessments->groupBy(function ($assessment) {
             if (!$assessment->assessment_date) return null;
             $date = $assessment->assessment_date;
-            if (!$date instanceof \Carbon\Carbon) {
+            if (!$date instanceof Carbon) {
                 $date = Carbon::parse((string)$date);
             }
             return (int)$date->month;
@@ -168,10 +153,9 @@ class AssessmentController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate and store the new assessment
-        $this->validateAssessmentData($request, null);
-        Assessment::create($request->all());
-        return redirect()->route('assessments.index')->with('success', 'Assessment created successfully.');
+        $validatedData = $this->validatedData($request);
+        Assessment::create($validatedData);
+        return redirect()->route('assessments.index')->with('success', 'Data asesmen internal berhasil ditambahkan.');
     }
 
     /**
@@ -188,40 +172,33 @@ class AssessmentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Assessment $assessment)
     {
-        // Show form for editing an existing assessment
-        $assessment = Assessment::findOrFail($id);
-        // Include related entities for dropdowns
         return view('assessments.form', [
             'assessment' => $assessment,
-            'assessees' => Assessee::with('entity')->get(),
-            'assessors' => Assessor::all(),
-            'schemes' => Scheme::all(),
+            'assessees'  => Assessee::orderBy('name')->get(),
+            'assessors'  => Assessor::orderBy('name')->get(),
+            'schemes'    => Scheme::orderBy('name')->get(),
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Assessment $assessment)
     {
-        // Validate and update the existing assessment
-        $assessment = Assessment::findOrFail($id);
-        $this->validateAssessmentData($request, $assessment);
-        $assessment->update($request->all());
-        return redirect()->route('assessments.index')->with('success', 'Assessment updated successfully.');
+        $validatedData = $this->validatedData($request);
+        $assessment->update($validatedData);
+        return redirect()->route('assessments.index')->with('success', 'Data asesmen internal berhasil diperbarui.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Assessment $assessment)
     {
-        // Delete the specified assessment
-        $assessment = Assessment::findOrFail($id);
         $assessment->delete();
-        return redirect()->route('assessments.index')->with('success', 'Assessment deleted successfully.');
+        return redirect()->route('assessments.index')->with('success', 'Data asesmen internal berhasil dihapus.');
     }
 
     /**
@@ -241,44 +218,41 @@ class AssessmentController extends Controller
      */
     public function storeExternal(Request $request)
     {
-        $this->validateAssessmentData($request, null);
-        $assessment = new Assessment($request->all());
-        $assessment->save();
-        return redirect()->route('assessments.indexExternal')->with('success', 'External assessment created successfully.');
+         $validatedData = $this->validatedData($request);
+        Assessment::create($validatedData);
+        return redirect()->route('assessments.indexExternal')->with('success', 'Data asesmen eksternal berhasil ditambahkan.');
     }
 
     /**
      * Show the form for editing the specified external assessment.
      */
-    public function editExternal($id)
+    public function editExternal(Assessment $assessment)
     {
-        $assessment = Assessment::findOrFail($id);
+
         return view('assessments.form-eksternal', [
             'assessment' => $assessment,
-            'assessees' => Assessee::with('entity')->where('assessee_type', 'Eksternal')->get(),
-            'assessors' => Assessor::all(),
-            'schemes' => Scheme::all(),
+            'assessees'  => Assessee::orderBy('name')->get(),
+            'assessors'  => Assessor::orderBy('name')->get(),
+            'schemes'    => Scheme::orderBy('name')->get(),
         ]);
     }
 
     /**
      * Update the specified external assessment in storage.
      */
-    public function updateExternal(Request $request, $id)
+    public function updateExternal(Request $request, Assessment $assessment)
     {
-        $assessment = Assessment::findOrFail($id);
-        $this->validateAssessmentData($request, $assessment);
-        $assessment->update($request->all());
-        return redirect()->route('assessments.indexExternal')->with('success', 'External assessment updated successfully.');
+        $validatedData = $this->validatedData($request);
+        $assessment->update($validatedData);
+        return redirect()->route('assessments.indexExternal')->with('success', 'Data asesmen eksternal berhasil diperbarui.');
     }
 
     /**
      * Remove the specified external assessment from storage.
      */
-    public function destroyExternal($id)
+    public function destroyExternal(Assessment $assessment)
     {
-        $assessment = Assessment::findOrFail($id);
         $assessment->delete();
-        return redirect()->route('assessments.indexExternal')->with('success', 'External assessment deleted successfully.');
+        return redirect()->route('assessments.indexExternal')->with('success', 'Data asesmen eksternal berhasil dihapus.');
     }
 }

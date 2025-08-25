@@ -58,7 +58,10 @@ class TargetRealisasiController extends Controller
         }
         $realizations = $realizations->values();
 
-        $entities = Entity::query()->get();
+        $excludedEntities = ['Kimia Farma', 'SHU'];
+        $entities = Entity::query()
+                        ->whereNotIn('name', $excludedEntities)
+                        ->get();
 
         $targetMonthlyTotals = [];
         for ($month = 1; $month <= 12; $month++) {
