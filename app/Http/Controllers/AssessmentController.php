@@ -57,8 +57,6 @@ class AssessmentController extends Controller
             ->orderBy('assessment_date', 'asc')
             ->orderBy('pre_assessment_date', 'asc')
             ->get();
-        
-        dd($assessments);
 
         // 4. Group by month number (1-12)
         $assessmentsByMonthRaw = $assessments->groupBy(function ($assessment) {
@@ -111,6 +109,8 @@ class AssessmentController extends Controller
             ->orderBy('assessment_date', 'asc')
             ->orderBy('pre_assessment_date', 'asc')
             ->get();
+
+        dd($assessments);
 
         // 4. Group by month number (1-12)
         $assessmentsByMonthRaw = $assessments->groupBy(function ($assessment) {
