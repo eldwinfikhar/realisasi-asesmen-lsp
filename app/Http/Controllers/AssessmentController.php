@@ -15,7 +15,7 @@ class AssessmentController extends Controller
      * Centralized validation for assessment data.
      * Validates 'band' for internal, 'location' for external.
      */
-    private function validatedData(Request $request, ?Assessment $assessment = null)
+    private function validatedData(Request $request)
     {
          return $request->validate([
             'assessee_id' => 'required|exists:assessees,id',
@@ -109,8 +109,6 @@ class AssessmentController extends Controller
             ->orderBy('assessment_date', 'asc')
             ->orderBy('pre_assessment_date', 'asc')
             ->get();
-
-        dd($assessments);
 
         // 4. Group by month number (1-12)
         $assessmentsByMonthRaw = $assessments->groupBy(function ($assessment) {
