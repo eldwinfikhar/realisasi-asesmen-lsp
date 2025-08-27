@@ -49,9 +49,9 @@ class AssessmentController extends Controller
 
         // 3. Query all assessments for the selected year, eager loading relationships
         $assessments = Assessment::with(['assessee.entity', 'assessor', 'scheme'])
-            ->whereRaw("EXTRACT(YEAR FROM assessment_date) = ?", [$year])
+            ->whereYear('assessment_date', $year)
             ->whereHas('assessee', function($query) {
-                $query->where('assessee_type', 'Eksternal');
+                $query->whereRaw('LOWER(assessee_type) = ?', ['eksternal']);
             })
             ->orderBy('assessment_date', 'asc')
             ->orderBy('pre_assessment_date', 'asc')
@@ -100,9 +100,9 @@ class AssessmentController extends Controller
 
         // 3. Query all assessments for the selected year, eager loading relationships
         $assessments = Assessment::with(['assessee.entity', 'assessor', 'scheme'])
-            ->whereRaw("DISTINCT EXTRACT(YEAR FROM assessment_date) = ?", [$year])
+            ->whereYear('assessment_date', $year)
             ->whereHas('assessee', function($query) {
-                $query->where('assessee_type', 'Internal');
+                $query->whereRaw('LOWER(assessee_type) = ?', ['internal']);
             })
             ->orderBy('assessment_date', 'asc')
             ->orderBy('pre_assessment_date', 'asc')
