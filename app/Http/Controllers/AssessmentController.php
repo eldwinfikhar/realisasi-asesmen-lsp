@@ -34,7 +34,7 @@ class AssessmentController extends Controller
     public function indexExternal(Request $request)
     {
         // 1. Get all available years from assessments (SQLite compatible)
-        $years = Assessment::selectRaw("YEAR(assessment_date) as year")
+        $years = Assessment::selectRaw("DISTINCT EXTRACT(YEAR FROM assessment_date) as year")
             ->distinct()
             ->orderByDesc('year')
             ->pluck('year')
@@ -50,7 +50,7 @@ class AssessmentController extends Controller
 
         // 3. Query all assessments for the selected year, eager loading relationships
         $assessments = Assessment::with(['assessee.entity', 'assessor', 'scheme'])
-            ->whereRaw("YEAR(assessment_date) = ?", [$year])
+            ->whereRaw("EXTRACT(YEAR FROM assessment_date) = ?", [$year])
             ->whereHas('assessee', function($query) {
                 $query->where('assessee_type', 'Eksternal');
             })
@@ -86,7 +86,7 @@ class AssessmentController extends Controller
     public function index(Request $request)
     {
         // 1. Get all available years from assessments (SQLite compatible)
-        $years = Assessment::selectRaw("YEAR(assessment_date) as year")
+        $years = Assessment::selectRaw("DISTINCT EXTRACT(YEAR FROM assessment_date) as year")
             ->distinct()
             ->orderByDesc('year')
             ->pluck('year')
@@ -102,7 +102,7 @@ class AssessmentController extends Controller
 
         // 3. Query all assessments for the selected year, eager loading relationships
         $assessments = Assessment::with(['assessee.entity', 'assessor', 'scheme'])
-            ->whereRaw("YEAR(assessment_date) = ?", [$year])
+            ->whereRaw("DISTINCT EXTRACT(YEAR FROM assessment_date) = ?", [$year])
             ->whereHas('assessee', function($query) {
                 $query->where('assessee_type', 'Internal');
             })

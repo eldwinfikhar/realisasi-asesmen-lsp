@@ -13,7 +13,7 @@ class RekapBandController extends Controller
     {
 
         // 0. Get a list of available years from assessments table (dynamic, SQLite compatible)
-        $availableYears = Assessment::query()->selectRaw('DISTINCT YEAR(assessment_date) as year')->orderByDesc('year')->pluck('year');
+        $availableYears = Assessment::query()->selectRaw('DISTINCT EXTRACT(YEAR FROM assessment_date) as year')->orderByDesc('year')->pluck('year');
         $selectedYear = request('year', $availableYears->first());
 
         // 1. Fetch all assessments for the selected year, eager load assessee and assessee.entity
