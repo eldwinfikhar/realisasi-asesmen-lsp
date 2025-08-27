@@ -56,17 +56,17 @@
                     @php $counter = 1; @endphp
                     @foreach($assessments as $assessment)
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ $counter }}</td>
+                            <td class="px-6 py-4 text-center whitespace-nowrap">{{ $counter }}.</td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ $assessment->assessee->name }}</td>
-                            <td class="px-9 py-4 whitespace-nowrap">{{ $assessment->assessee->band }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ $assessment->scheme->name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ $assessment->scheme->scope }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ $assessment->pre_assessment_date ? Carbon::parse($assessment->pre_assessment_date)->format('d-m-Y') : '' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ $assessment->pre_assessment_venue }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ $assessment->assessment_date ? Carbon::parse($assessment->assessment_date)->format('d-m-Y') : '' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ $assessment->assessment_venue }}</td>
+                            <td class="px-9 py-4 text-center whitespace-nowrap">{{ $assessment->assessee->band }}</td>
+                            <td class="px-6 py-4 text-center whitespace-nowrap">{{ $assessment->scheme->name }}</td>
+                            <td class="px-6 py-4 text-center whitespace-nowrap">{{ $assessment->scheme->scope }}</td>
+                            <td class="px-6 py-4 text-center whitespace-nowrap">{{ $assessment->pre_assessment_date ? Carbon::parse($assessment->pre_assessment_date)->format('d-m-Y') : '' }}</td>
+                            <td class="px-6 py-4 text-center whitespace-nowrap">{{ $assessment->pre_assessment_venue }}</td>
+                            <td class="px-6 py-4 text-center whitespace-nowrap">{{ $assessment->assessment_date ? Carbon::parse($assessment->assessment_date)->format('d-m-Y') : '' }}</td>
+                            <td class="px-6 py-4 text-center whitespace-nowrap">{{ $assessment->assessment_venue }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ $assessment->assessor->name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ $assessment->assessee->entity->name }}</td>
+                            <td class="px-6 py-4 text-center whitespace-nowrap">{{ $assessment->assessee->entity->name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap flex gap-2">
                                 <a href="{{ route('assessments.edit', $assessment->id) }}" class="px-2 py-2 bg-yellow-400 hover:bg-yellow-500 text-white rounded text-xs flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

@@ -174,7 +174,7 @@ class AssessmentController extends Controller
     {
         return view('assessments.form', [
             'assessment' => $assessment,
-            'assessees'  => Assessee::orderBy('name')->get(),
+            'assessees'  => Assessee::with('entity')->orderBy('name')->get(),
             'assessors'  => Assessor::orderBy('name')->get(),
             'schemes'    => Scheme::orderBy('name')->get(),
         ]);
@@ -229,7 +229,7 @@ class AssessmentController extends Controller
 
         return view('assessments.form-eksternal', [
             'assessment' => $assessment,
-            'assessees'  => Assessee::orderBy('name')->get(),
+            'assessees'  => Assessee::with('entity')->orderBy('name')->get(),
             'assessors'  => Assessor::orderBy('name')->get(),
             'schemes'    => Scheme::orderBy('name')->get(),
         ]);
