@@ -35,7 +35,6 @@ class AssessmentController extends Controller
     {
         // 1. Get all available years from assessments (SQLite compatible)
         $years = Assessment::selectRaw("DISTINCT EXTRACT(YEAR FROM assessment_date) as year")
-            ->distinct()
             ->orderByDesc('year')
             ->pluck('year')
             ->toArray();
@@ -87,7 +86,6 @@ class AssessmentController extends Controller
     {
         // 1. Get all available years from assessments (SQLite compatible)
         $years = Assessment::selectRaw("DISTINCT EXTRACT(YEAR FROM assessment_date) as year")
-            ->distinct()
             ->orderByDesc('year')
             ->pluck('year')
             ->toArray();
