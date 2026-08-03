@@ -1,61 +1,187 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Realisasi Asesmen LSP
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel-based web application to manage and monitor LSP assessment realization, including master data, internal/external assessment execution, and yearly target-vs-realization reporting.
 
-## About Laravel
+## Table of Contents
+- [Overview](#overview)
+- [Core Features](#core-features)
+- [Tech Stack](#tech-stack)
+- [Data Model (High Level)](#data-model-high-level)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Database and Initial Data](#database-and-initial-data)
+- [Run the Application](#run-the-application)
+- [Available Commands](#available-commands)
+- [Testing](#testing)
+- [UI Modules](#ui-modules)
+- [API/Health Endpoint](#apihealth-endpoint)
+- [Deployment Notes](#deployment-notes)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Overview
+This project helps teams track assessment activities against annual targets, with support for:
+- Internal assessments (entity/band context)
+- External assessments (location context)
+- Dashboard KPIs and trend charts
+- Recap reports by band and target realization
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The app is built with Laravel 12, Blade, Tailwind CSS, and Alpine.js.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Core Features
+- **Authentication** (Laravel Breeze)
+- **Master data management**
+  - Assessees
+  - Assessors
+  - Schemes
+- **Assessment management**
+  - Internal assessment records
+  - External assessment records
+- **Dashboard analytics**
+  - Total assessees, assessments, active assessors, active schemes
+  - Monthly trend and target comparison
+  - Internal vs external distribution
+- **Reports**
+  - Recap per band (`/laporan/rekap-band`)
+  - Target vs realization (`/laporan/target-realisasi`)
+- **Excel import pipeline** for bootstrap/operational data loading
 
-## Learning Laravel
+## Tech Stack
+- **Backend:** PHP 8.2+, Laravel 12
+- **Frontend:** Blade, Tailwind CSS, Alpine.js, Vite
+- **Database:** SQLite (default local), PostgreSQL supported (`ext-pgsql` required)
+- **Excel Processing:** `maatwebsite/excel`
+- **Testing:** PHPUnit
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Data Model (High Level)
+Main entities:
+- `entities`
+- `assessees` (internal/external type, band/location)
+- `assessors`
+- `schemes` (with scope)
+- `assessments` (links assessee, assessor, scheme, plus dates/venues/notes)
+- `assessment_targets` (yearly/monthly targets per internal entity or external location)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Prerequisites
+- PHP **8.2+**
+- Composer
+- Node.js + npm
+- Database engine:
+  - SQLite (quick local setup), or
+  - PostgreSQL
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Installation
+```bash
+git clone <repository-url>
+cd realisasi-asesmen-lsp
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+```
 
-## Laravel Sponsors
+## Configuration
+Update `.env` based on your environment.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### SQLite (default quick setup)
+```env
+DB_CONNECTION=sqlite
+```
+Then create the database file if needed:
+```bash
+touch database/database.sqlite
+```
 
-### Premium Partners
+### PostgreSQL example
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=your_database
+DB_USERNAME=your_user
+DB_PASSWORD=your_password
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Database and Initial Data
+### Option A — Full automated setup (recommended)
+Run migrations, seeders, and all Excel imports in one command:
+```bash
+php artisan app:setup --fresh
+```
+- `--fresh` resets all tables first.
+- Without `--fresh`, it runs migrate + seed + import on current DB state.
 
-## Contributing
+### Option B — Manual setup
+```bash
+php artisan migrate --seed
+```
+Then run import commands one by one:
+```bash
+php artisan import:entities storage/app/data-entities.xlsx
+php artisan import:schemes storage/app/data-schemes.xlsx
+php artisan import:assessors storage/app/data-assessors.xlsx
+php artisan import:assessees storage/app/data-assessees.xlsx
+php artisan import:assessment-targets storage/app/data-assessment-targets.xlsx
+php artisan import:assessments storage/app/data-assessments.xlsx
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Seeded Login User
+`UserSeeder` creates one default user. For security, change this password immediately in non-local environments.
 
-## Code of Conduct
+## Run the Application
+### Development mode (recommended)
+```bash
+composer run dev
+```
+This runs Laravel server, queue listener, log tailing, and Vite concurrently.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Alternative (separate terminals)
+```bash
+php artisan serve
+npm run dev
+```
 
-## Security Vulnerabilities
+## Available Commands
+- `php artisan app:setup {--fresh}`
+- `php artisan import:entities {file}`
+- `php artisan import:schemes {file}`
+- `php artisan import:assessors {file}`
+- `php artisan import:assessees {file}`
+- `php artisan import:assessment-targets {file}`
+- `php artisan import:assessments {file}`
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Testing
+```bash
+composer test
+```
+or
+```bash
+php artisan test
+```
 
-## License
+## UI Modules
+Sidebar modules:
+- **Dashboard**
+- **Data Master**
+  - Daftar Asesi
+  - Laporan Asesor
+  - Laporan Skema
+- **Realisasi Asesmen**
+  - Internal
+  - Eksternal
+- **Laporan**
+  - Rekap per Band
+  - Target Realisasi
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## API/Health Endpoint
+- `GET /up` returns `200 OK` for health checks (useful for platform probes, e.g. Railway).
+
+## Deployment Notes
+- Set `APP_ENV=production` and `APP_DEBUG=false` in production.
+- Configure a production-grade DB (typically PostgreSQL).
+- Run:
+  ```bash
+  php artisan config:cache
+  php artisan route:cache
+  php artisan view:cache
+  ```
+- Ensure file permissions for `storage/` and `bootstrap/cache/` are correct.
